@@ -1,6 +1,8 @@
+/* eslint-disable react/no-unknown-property */
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import emailjs from '@emailjs/browser';
+import Lanyard from './Lanyard';
 import { 
   Mail, 
   Send, 
@@ -14,7 +16,10 @@ import {
   Percent,
   Clock,
   Crown,
-  Award
+  Award,
+  Gamepad2,
+  Users,
+  Sparkles
 } from 'lucide-react';
 
 interface EmailFormData {
@@ -31,18 +36,21 @@ function Offers() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState('');
 
+  // 3x3 Bento Grid Offers
   const offers = [
     {
       id: 'elite-pro-bundle',
       title: "Elite Pro Bundle",
       discount: "25% OFF",
-      description: "Complete cricket kit with premium bat, pads, and gloves",
+      description: "Complete cricket kit with premium bat, pads, and gloves for professional players",
       originalPrice: "₹45,999",
       offerPrice: "₹34,499",
       icon: <Trophy size={24} />,
       color: "from-yellow-500 to-orange-500",
       badge: "Best Value",
-      features: ["Premium English Willow Bat", "Professional Pads & Gloves", "Complete Protection Set"]
+      features: ["Premium English Willow Bat", "Professional Pads & Gloves", "Complete Protection Set"],
+      gridSize: "large", // Takes 2 columns
+      type: "product"
     },
     {
       id: 'professional-bat-series',
@@ -54,7 +62,9 @@ function Offers() {
       icon: <Target size={24} />,
       color: "from-green-500 to-emerald-500",
       badge: "Limited Time",
-      features: ["English Willow Wood", "Hand-Finished", "Professional Grade"]
+      features: ["English Willow Wood", "Hand-Finished", "Professional Grade"],
+      gridSize: "normal",
+      type: "product"
     },
     {
       id: 'guardian-protection-set',
@@ -66,7 +76,33 @@ function Offers() {
       icon: <Shield size={24} />,
       color: "from-blue-500 to-cyan-500",
       badge: "Popular",
-      features: ["Lightweight Design", "Superior Protection", "Moisture-Wicking"]
+      features: ["Lightweight Design", "Superior Protection", "Moisture-Wicking"],
+      gridSize: "normal",
+      type: "product"
+    },
+    {
+      id: 'brand-ambassador',
+      title: "Brand Ambassadors",
+      description: "Meet our cricket champions who trust Zelion gear",
+      icon: <Users size={24} />,
+      color: "from-purple-500 to-indigo-500",
+      badge: "Champions",
+      gridSize: "tall", // Takes 2 rows
+      type: "ambassador",
+      ambassadors: [
+        {
+          name: "Rohit Sharma",
+          role: "International Cricketer",
+          image: "https://images.pexels.com/photos/163452/basketball-dunk-blue-game-163452.jpeg",
+          quote: "Zelion gear gives me the confidence to perform at my best"
+        },
+        {
+          name: "Virat Kohli",
+          role: "Former Captain",
+          image: "https://images.pexels.com/photos/1263348/pexels-photo-1263348.jpeg",
+          quote: "The precision and quality are unmatched"
+        }
+      ]
     },
     {
       id: 'speed-training-kit',
@@ -78,7 +114,9 @@ function Offers() {
       icon: <Zap size={24} />,
       color: "from-purple-500 to-indigo-500",
       badge: "New",
-      features: ["Training Cones", "Speed Ladder", "Agility Equipment"]
+      features: ["Training Cones", "Speed Ladder", "Agility Equipment"],
+      gridSize: "normal",
+      type: "product"
     },
     {
       id: 'champions-collection',
@@ -90,7 +128,19 @@ function Offers() {
       icon: <Crown size={24} />,
       color: "from-pink-500 to-rose-500",
       badge: "Exclusive",
-      features: ["Championship Grade", "Limited Edition", "Signed Certificate"]
+      features: ["Championship Grade", "Limited Edition", "Signed Certificate"],
+      gridSize: "normal",
+      type: "product"
+    },
+    {
+      id: 'interactive-lanyard',
+      title: "Interactive 3D Experience",
+      description: "Drag and interact with our premium Zelion lanyard",
+      icon: <Gamepad2 size={24} />,
+      color: "from-cyan-500 to-blue-500",
+      badge: "Interactive",
+      gridSize: "wide", // Takes 2 columns
+      type: "interactive"
     },
     {
       id: 'academy-starter-pack',
@@ -100,9 +150,25 @@ function Offers() {
       originalPrice: "₹18,999",
       offerPrice: "₹11,399",
       icon: <Award size={24} />,
-      color: "from-cyan-500 to-blue-500",
+      color: "from-emerald-500 to-green-500",
       badge: "Student Special",
-      features: ["Academy Approved", "Beginner Friendly", "Growth Kit"]
+      features: ["Academy Approved", "Beginner Friendly", "Growth Kit"],
+      gridSize: "normal",
+      type: "product"
+    },
+    {
+      id: 'premium-membership',
+      title: "Premium Membership",
+      discount: "50% OFF",
+      description: "Exclusive access to limited editions and early releases",
+      originalPrice: "₹9,999/year",
+      offerPrice: "₹4,999/year",
+      icon: <Sparkles size={24} />,
+      color: "from-violet-500 to-purple-500",
+      badge: "VIP Access",
+      features: ["Early Access", "Exclusive Discounts", "Priority Support"],
+      gridSize: "normal",
+      type: "membership"
     }
   ];
 
@@ -165,6 +231,119 @@ function Offers() {
     // Scroll to email form
     const emailForm = document.getElementById('email-subscription-form');
     emailForm?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const renderOfferCard = (offer: any, index: number) => {
+    const baseClasses = "offer-card";
+    const sizeClasses = {
+      large: "offer-card-large",
+      tall: "offer-card-tall", 
+      wide: "offer-card-wide",
+      normal: ""
+    };
+
+    if (offer.type === 'ambassador') {
+      return (
+        <motion.div
+          key={offer.id}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          viewport={{ once: true }}
+          className={`${baseClasses} ${sizeClasses[offer.gridSize]} ambassador-card`}
+        >
+          <div className="offer-badge">{offer.badge}</div>
+          <div className={`offer-icon bg-gradient-to-br ${offer.color}`}>
+            {offer.icon}
+          </div>
+          <h3 className="offer-title">{offer.title}</h3>
+          <p className="offer-description">{offer.description}</p>
+          
+          <div className="ambassadors-grid">
+            {offer.ambassadors.map((ambassador: any, idx: number) => (
+              <div key={idx} className="ambassador-item">
+                <div className="ambassador-image">
+                  <img src={ambassador.image} alt={ambassador.name} />
+                </div>
+                <div className="ambassador-info">
+                  <h4 className="ambassador-name">{ambassador.name}</h4>
+                  <p className="ambassador-role">{ambassador.role}</p>
+                  <blockquote className="ambassador-quote">"{ambassador.quote}"</blockquote>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      );
+    }
+
+    if (offer.type === 'interactive') {
+      return (
+        <motion.div
+          key={offer.id}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          viewport={{ once: true }}
+          className={`${baseClasses} ${sizeClasses[offer.gridSize]} interactive-card`}
+        >
+          <div className="offer-badge">{offer.badge}</div>
+          <div className={`offer-icon bg-gradient-to-br ${offer.color}`}>
+            {offer.icon}
+          </div>
+          <h3 className="offer-title">{offer.title}</h3>
+          <p className="offer-description">{offer.description}</p>
+          
+          <div className="lanyard-container">
+            <Lanyard />
+          </div>
+        </motion.div>
+      );
+    }
+
+    // Regular product/membership cards
+    return (
+      <motion.div
+        key={offer.id}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        viewport={{ once: true }}
+        className={`${baseClasses} ${sizeClasses[offer.gridSize]}`}
+      >
+        <div className="offer-badge">{offer.badge}</div>
+        <div className={`offer-icon bg-gradient-to-br ${offer.color}`}>
+          {offer.icon}
+        </div>
+        {offer.discount && <div className="offer-discount">{offer.discount}</div>}
+        <h3 className="offer-title">{offer.title}</h3>
+        <p className="offer-description">{offer.description}</p>
+        
+        {offer.features && (
+          <div className="offer-features">
+            {offer.features.map((feature: string, idx: number) => (
+              <span key={idx} className="feature-tag">
+                {feature}
+              </span>
+            ))}
+          </div>
+        )}
+        
+        {offer.originalPrice && (
+          <div className="offer-pricing">
+            <span className="original-price">{offer.originalPrice}</span>
+            <span className="offer-price">{offer.offerPrice}</span>
+          </div>
+        )}
+        
+        <button 
+          className="offer-button"
+          onClick={() => handleClaimOffer(offer.id, offer.title)}
+        >
+          {offer.type === 'membership' ? 'Join Now' : 'Claim Offer'}
+        </button>
+      </motion.div>
+    );
   };
 
   return (
@@ -284,7 +463,7 @@ function Offers() {
           </div>
         </motion.div>
 
-        {/* Offers Bento Grid */}
+        {/* 3x3 Bento Grid */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -292,45 +471,7 @@ function Offers() {
           viewport={{ once: true }}
           className="offers-bento-grid"
         >
-          {offers.map((offer, index) => (
-            <motion.div
-              key={offer.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className={`offer-card ${index === 0 || index === 5 ? 'offer-card-large' : ''}`}
-            >
-              <div className="offer-badge">
-                {offer.badge}
-              </div>
-              <div className={`offer-icon bg-gradient-to-br ${offer.color}`}>
-                {offer.icon}
-              </div>
-              <div className="offer-discount">{offer.discount}</div>
-              <h3 className="offer-title">{offer.title}</h3>
-              <p className="offer-description">{offer.description}</p>
-              
-              <div className="offer-features">
-                {offer.features.map((feature, idx) => (
-                  <span key={idx} className="feature-tag">
-                    {feature}
-                  </span>
-                ))}
-              </div>
-              
-              <div className="offer-pricing">
-                <span className="original-price">{offer.originalPrice}</span>
-                <span className="offer-price">{offer.offerPrice}</span>
-              </div>
-              <button 
-                className="offer-button"
-                onClick={() => handleClaimOffer(offer.id, offer.title)}
-              >
-                Claim Offer
-              </button>
-            </motion.div>
-          ))}
+          {offers.map((offer, index) => renderOfferCard(offer, index))}
         </motion.div>
       </div>
     </section>

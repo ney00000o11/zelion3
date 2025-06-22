@@ -673,11 +673,11 @@ body {
   color: var(--text-secondary);
 }
 
-/* Offers Bento Grid */
+/* 3x3 Bento Grid */
 .offers-bento-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-rows: repeat(3, minmax(300px, auto));
   gap: 1.5rem;
   margin-bottom: 4rem;
   position: relative;
@@ -698,8 +698,17 @@ body {
   justify-content: space-between;
 }
 
+/* Grid Size Variants */
 .offer-card-large {
+  grid-column: span 2;
+}
+
+.offer-card-tall {
   grid-row: span 2;
+}
+
+.offer-card-wide {
+  grid-column: span 2;
 }
 
 .offer-card:hover {
@@ -857,6 +866,78 @@ body {
 .offer-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+}
+
+/* Ambassador Card Styles */
+.ambassador-card {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1));
+}
+
+.ambassadors-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.ambassador-item {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ambassador-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ambassador-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ambassador-info {
+  flex: 1;
+}
+
+.ambassador-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.ambassador-role {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.ambassador-quote {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Interactive Card Styles */
+.interactive-card {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+}
+
+.lanyard-container {
+  flex: 1;
+  margin-top: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 /* Carousel Styles */
@@ -1397,7 +1478,10 @@ body {
     grid-template-rows: auto;
   }
 
-  .offer-card-large {
+  .offer-card-large,
+  .offer-card-tall,
+  .offer-card-wide {
+    grid-column: span 1;
     grid-row: span 1;
   }
 

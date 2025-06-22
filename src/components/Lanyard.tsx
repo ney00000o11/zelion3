@@ -43,20 +43,38 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   const vec = new THREE.Vector3(), ang = new THREE.Vector3(), rot = new THREE.Vector3(), dir = new THREE.Vector3();
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
   
-  // Fallback texture - create a simple pattern
+  // Create a dynamic texture with Zelion branding
   const [texture] = useState(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 32;
+    canvas.width = 512;
+    canvas.height = 64;
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      ctx.fillStyle = '#22c55e';
-      ctx.fillRect(0, 0, 256, 32);
+      // Create gradient background
+      const gradient = ctx.createLinearGradient(0, 0, 512, 0);
+      gradient.addColorStop(0, '#22c55e');
+      gradient.addColorStop(0.5, '#16a34a');
+      gradient.addColorStop(1, '#22c55e');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 512, 64);
+      
+      // Add pattern
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      for (let i = 0; i < 512; i += 32) {
+        ctx.fillRect(i, 0, 16, 64);
+      }
+      
+      // Add text
       ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('ZELION CRICKET', 256, 25);
       ctx.font = '12px Arial';
-      ctx.fillText('ZELION', 100, 20);
+      ctx.fillText('PREMIUM GEAR', 256, 45);
     }
-    return new THREE.CanvasTexture(canvas);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    return tex;
   });
 
   const [curve] = useState(() => new THREE.CatmullRomCurve3([
@@ -125,9 +143,6 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
     }
   });
 
-  curve.curveType = 'chordal';
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-
   return (
     <>
       <group position={[0, 4, 0]}>
@@ -159,19 +174,33 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
               drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())))
             )}
           >
-            {/* Fallback card geometry */}
+            {/* Main card */}
             <Box args={[1.6, 2.25, 0.02]}>
+              <meshPhysicalMaterial 
+                color="#1a1a1a" 
+                clearcoat={1} 
+                clearcoatRoughness={0.15} 
+                roughness={0.3} 
+                metalness={0.1} 
+              />
+            </Box>
+            {/* Zelion logo area */}
+            <Box args={[1.4, 0.8, 0.025]} position={[0, 0.4, 0.01]}>
               <meshPhysicalMaterial 
                 color="#22c55e" 
                 clearcoat={1} 
-                clearcoatRoughness={0.15} 
-                roughness={0.9} 
-                metalness={0.8} 
+                clearcoatRoughness={0.1} 
+                roughness={0.2} 
+                metalness={0.3} 
               />
             </Box>
             {/* Card clip */}
             <Box args={[0.2, 0.4, 0.1]} position={[0, 1, 0.05]}>
               <meshStandardMaterial color="#888888" roughness={0.3} metalness={0.8} />
+            </Box>
+            {/* Card clamp */}
+            <Box args={[0.15, 0.3, 0.08]} position={[0, 1, 0.08]}>
+              <meshStandardMaterial color="#666666" roughness={0.4} metalness={0.9} />
             </Box>
           </group>
         </RigidBody>
