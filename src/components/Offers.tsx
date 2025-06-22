@@ -12,16 +12,20 @@ import {
   Zap,
   Gift,
   Percent,
-  Clock
+  Clock,
+  Crown,
+  Award
 } from 'lucide-react';
 
 interface EmailFormData {
   email: string;
+  selectedOffer?: string;
 }
 
 function Offers() {
   const [formData, setFormData] = useState<EmailFormData>({
-    email: ''
+    email: '',
+    selectedOffer: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -29,6 +33,7 @@ function Offers() {
 
   const offers = [
     {
+      id: 'elite-pro-bundle',
       title: "Elite Pro Bundle",
       discount: "25% OFF",
       description: "Complete cricket kit with premium bat, pads, and gloves",
@@ -36,9 +41,11 @@ function Offers() {
       offerPrice: "₹34,499",
       icon: <Trophy size={24} />,
       color: "from-yellow-500 to-orange-500",
-      badge: "Best Value"
+      badge: "Best Value",
+      features: ["Premium English Willow Bat", "Professional Pads & Gloves", "Complete Protection Set"]
     },
     {
+      id: 'professional-bat-series',
       title: "Professional Bat Series",
       discount: "20% OFF",
       description: "Handcrafted English willow bats for serious players",
@@ -46,9 +53,11 @@ function Offers() {
       offerPrice: "₹15,999",
       icon: <Target size={24} />,
       color: "from-green-500 to-emerald-500",
-      badge: "Limited Time"
+      badge: "Limited Time",
+      features: ["English Willow Wood", "Hand-Finished", "Professional Grade"]
     },
     {
+      id: 'guardian-protection-set',
       title: "Guardian Protection Set",
       discount: "30% OFF",
       description: "Complete protective gear including pads, helmet, and guards",
@@ -56,9 +65,11 @@ function Offers() {
       offerPrice: "₹18,199",
       icon: <Shield size={24} />,
       color: "from-blue-500 to-cyan-500",
-      badge: "Popular"
+      badge: "Popular",
+      features: ["Lightweight Design", "Superior Protection", "Moisture-Wicking"]
     },
     {
+      id: 'speed-training-kit',
       title: "Speed Training Kit",
       discount: "15% OFF",
       description: "Professional training equipment for skill development",
@@ -66,34 +77,38 @@ function Offers() {
       offerPrice: "₹11,049",
       icon: <Zap size={24} />,
       color: "from-purple-500 to-indigo-500",
-      badge: "New"
-    }
-  ];
-
-  const testimonials = [
-    {
-      quote: "Zelion balls changed the game for me! The precision and quality are unmatched.",
-      author: "Rohit Sharma",
-      role: "International Cricketer",
-      rating: 5
+      badge: "New",
+      features: ["Training Cones", "Speed Ladder", "Agility Equipment"]
     },
     {
-      quote: "The bat feels like an extension of my arm. Perfect balance and power delivery.",
-      author: "Virat Kohli",
-      role: "Former Captain",
-      rating: 5
+      id: 'champions-collection',
+      title: "Champions Collection",
+      discount: "35% OFF",
+      description: "Exclusive gear used by international cricket champions",
+      originalPrice: "₹55,999",
+      offerPrice: "₹36,399",
+      icon: <Crown size={24} />,
+      color: "from-pink-500 to-rose-500",
+      badge: "Exclusive",
+      features: ["Championship Grade", "Limited Edition", "Signed Certificate"]
     },
     {
-      quote: "Zelion's protective gear gives me confidence to play my natural game fearlessly.",
-      author: "MS Dhoni",
-      role: "Wicket-keeper Batsman",
-      rating: 5
+      id: 'academy-starter-pack',
+      title: "Academy Starter Pack",
+      discount: "40% OFF",
+      description: "Perfect starter kit for cricket academy students",
+      originalPrice: "₹18,999",
+      offerPrice: "₹11,399",
+      icon: <Award size={24} />,
+      color: "from-cyan-500 to-blue-500",
+      badge: "Student Special",
+      features: ["Academy Approved", "Beginner Friendly", "Growth Kit"]
     }
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setFormData({ email: value });
+    setFormData(prev => ({ ...prev, email: value }));
     setError('');
   };
 
@@ -122,8 +137,9 @@ function Offers() {
       // EmailJS configuration
       const templateParams = {
         user_email: formData.email,
+        selected_offer: formData.selectedOffer || 'Newsletter Subscription',
         to_email: 'adhiln968@gmail.com',
-        message: `New subscription from: ${formData.email}`,
+        message: `New subscription from: ${formData.email}${formData.selectedOffer ? ` - Selected Offer: ${formData.selectedOffer}` : ''}`,
         subject: 'New Newsletter Subscription - Zelion Cricket'
       };
 
@@ -135,13 +151,20 @@ function Offers() {
       await emailjs.send(serviceId, templateId, templateParams, publicKey);
       
       setIsSubmitted(true);
-      setFormData({ email: '' });
+      setFormData({ email: '', selectedOffer: '' });
     } catch (err) {
       console.error('EmailJS error:', err);
       setError('Failed to send email. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleClaimOffer = (offerId: string, offerTitle: string) => {
+    setFormData(prev => ({ ...prev, selectedOffer: offerTitle }));
+    // Scroll to email form
+    const emailForm = document.getElementById('email-subscription-form');
+    emailForm?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -161,8 +184,7 @@ function Offers() {
           </div>
           <h2 className="section-title">Glimpse to our assets</h2>
           <p className="section-subtitle">
-            Get exclusive access to our premium cricket gear at unbeatable prices. 
-            Subscribe to our newsletter for early access to sales and special offers.
+            "Zelion balls changed the game for me!" - Pro Cricketer
           </p>
         </motion.div>
 
@@ -179,6 +201,7 @@ function Offers() {
             alt="Zelion Cricket Equipment" 
             className="offers-image"
           />
+          <div className="image-glow"></div>
         </motion.div>
 
         {/* Email Subscription Form */}
@@ -188,6 +211,7 @@ function Offers() {
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
           className="email-subscription"
+          id="email-subscription-form"
         >
           <div className="subscription-content">
             <div className="subscription-info">
@@ -215,11 +239,17 @@ function Offers() {
             <div className="subscription-form-container">
               {!isSubmitted ? (
                 <form onSubmit={handleSubmit} className="subscription-form">
+                  {formData.selectedOffer && (
+                    <div className="selected-offer-display">
+                      <Gift size={16} />
+                      <span>Selected: {formData.selectedOffer}</span>
+                    </div>
+                  )}
                   <div className="email-input-group">
                     <input
                       type="email"
                       name="email"
-                      placeholder="adhiln968@gmail.com"
+                      placeholder="your@gmail.com"
                       value={formData.email}
                       onChange={handleInputChange}
                       className="email-input"
@@ -254,22 +284,22 @@ function Offers() {
           </div>
         </motion.div>
 
-        {/* Offers Grid */}
+        {/* Offers Bento Grid */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
           viewport={{ once: true }}
-          className="offers-grid"
+          className="offers-bento-grid"
         >
           {offers.map((offer, index) => (
             <motion.div
-              key={index}
+              key={offer.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="offer-card"
+              className={`offer-card ${index === 0 || index === 5 ? 'offer-card-large' : ''}`}
             >
               <div className="offer-badge">
                 {offer.badge}
@@ -280,57 +310,27 @@ function Offers() {
               <div className="offer-discount">{offer.discount}</div>
               <h3 className="offer-title">{offer.title}</h3>
               <p className="offer-description">{offer.description}</p>
+              
+              <div className="offer-features">
+                {offer.features.map((feature, idx) => (
+                  <span key={idx} className="feature-tag">
+                    {feature}
+                  </span>
+                ))}
+              </div>
+              
               <div className="offer-pricing">
                 <span className="original-price">{offer.originalPrice}</span>
                 <span className="offer-price">{offer.offerPrice}</span>
               </div>
-              <button className="offer-button">
+              <button 
+                className="offer-button"
+                onClick={() => handleClaimOffer(offer.id, offer.title)}
+              >
                 Claim Offer
               </button>
             </motion.div>
           ))}
-        </motion.div>
-
-        {/* Testimonials Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          viewport={{ once: true }}
-          className="testimonials-section"
-        >
-          <div className="testimonials-header">
-            <h3 className="testimonials-title">"Zelion balls changed the game for me!" - Pro Cricketer</h3>
-            <p className="testimonials-subtitle">What professional cricketers say about Zelion</p>
-          </div>
-          
-          <div className="testimonials-grid">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="testimonial-card"
-              >
-                <div className="testimonial-rating">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} size={16} className="star-filled" />
-                  ))}
-                </div>
-                <blockquote className="testimonial-quote">
-                  "{testimonial.quote}"
-                </blockquote>
-                <div className="testimonial-author">
-                  <div className="author-info">
-                    <span className="author-name">{testimonial.author}</span>
-                    <span className="author-role">{testimonial.role}</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </motion.div>
       </div>
     </section>
